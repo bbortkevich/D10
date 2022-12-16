@@ -1,0 +1,66 @@
+# Import all models
+from news.models import *
+
+#1 Create 2 users
+User.objects.create(username='Dude', password='123', first_name='Peter', last_name='Parker', email='pp@gmail.com')
+User.objects.create(username='Dude#2', password='321', first_name='Reed', last_name='Richards', email='rr@gmail.com')
+
+#2 Create 2 authors, references to users
+Author.objects.create(user=User.objects.get(username='Dude'))
+Author.objects.create(user=User.objects.get(username='Dude#2'))
+
+#3 Create 4 categories
+Category.objects.create(category_name='Science')
+Category.objects.create(category_name='Policy')
+Category.objects.create(category_name='IT')
+Category.objects.create(category_name='Nature')
+
+#4 Create 2 articles and 1 news
+    # Из-за большого количества текста выдает ошибку "invalid syntax. Perhaps you forgot a comma?" и "unterminated string literal (detected at line 1)"
+Post.objects.create(author=Author(pk=1), type='AR', title='IT in policy', text='The phrase ‘public policy’ is used in everyday parlance during the discussions in public domain with respect to the policies such as agriculture policy, health policy, foreign investment policy, economic policy, labour policy, education policy and so on. A policy is defined as a course of action and policy framed by the government and impacting the people, at large, is called a public policy. It comprises a set of intentions or purpose, a description of the direction in which the government intends to move or introduce reforms, the actors involved and the measures to be taken. Public policy plays one of the most crucial role in governance and drives the social and economic development. Public policymaking can be described as a dynamic, intricate, and interactive system in which public problems are discovered and solved by developing new policies or reforming the older ones. There are various models of Public Policy formulations and Implementation(PPFI) and also various methodologies/stages to facilitate adaption of those models. This article attempts to explore the role of IT in some of the popular models in depth.')
+Post.objects.create(author=Author(pk=1), type='AR', title='IT in science', text='None')
+Post.objects.create(author=Author(pk=2), type='NE', title='Our nature', text='Nature')
+
+#5 Categories to posts
+PostCategory.objects.create(post = Post.objects.get(pk=2), category = Category.objects.get(category_name='IT'))
+PostCategory.objects.create(post = Post.objects.get(pk=2), category = Category.objects.get(category_name='Policy'))
+PostCategory.objects.create(post = Post.objects.get(pk=3), category = Category.objects.get(category_name='IT'))
+PostCategory.objects.create(post = Post.objects.get(pk=3), category = Category.objects.get(category_name='Science'))
+# Почему-то пишет что категория Nature не существует "news.models.Category.DoesNotExist: Category matching query does not exist."
+PostCategory.objects.create(post = Post.objects.get(pk=4), category = Category.objects.get(category_name='Nature'))
+
+#6 Create 4 comments
+Comment.objects.create(post=Post.objects.get(pk=2), user=User.objects.get(username='Dude'), text='So interesting!')
+Comment.objects.create(post=Post.objects.get(pk=3), user=User.objects.get(username='Dude'), text='Low number of text. Dislike.')
+Comment.objects.create(post=Post.objects.get(pk=2), user=User.objects.get(username='Dude#2'), text='Amazing, bro!')
+Comment.objects.create(post=Post.objects.get(pk=4), user=User.objects.get(username='Dude#2'), text='Where is the text?')
+
+#7 Apply functions like()/dislike()
+Comment.objects.get(pk=1).like()
+Comment.objects.get(pk=2).dislike()
+Comment.objects.get(pk=3).like()
+Comment.objects.get(pk=4).dislike()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=2).like()
+Post.objects.get(pk=3).dislike()
+Post.objects.get(pk=3).dislike()
+Post.objects.get(pk=4).dislike()
+Post.objects.get(pk=4).dislike()
+
+#8 Generate user`s rating
+Author.objects.get(pk=1).update_rating()
+Author.objects.get(pk=2).update_rating()
+
+#9 Output best author`s username and rating
+Author.objects.all().order_by('-rating').values('user', 'rating')[0]
+
+#10 Output publication data, username, rating, title and best article`s preview basic on likes and dislikes
+Post.objects.all().order_by('-post_rating').values('data', 'author', 'post_rating', 'title')[0]
+best_post = Post.objects.all().order_by('-post_rating')[0]
+best_post.preview()
+
+#11 Output all comments (data, user, rating, text) to best article
+Comment.objects.filter(post=best_post).values('date', 'user', 'comment_rating', 'text')
+

@@ -1,0 +1,24 @@
+{% extends "flatpages/default.html" %}
+{% load custom_filters %}
+{% block title %}
+{{ news.title|censor }}
+{% endblock title %}
+{% block content %}
+<h1>{{ news.title|censor }}</h1>
+<p>{{ news.date|date:'d.m.Y' }}</p>
+<p>
+	{{ news.text|censor }}
+</p>
+{% for category in news.categories.all %}
+<p>Категория: {{ category.category_name }}</p>
+{% if user.is_authenticated %}
+{% if user in category.subscribers.all %}
+<a href="{% url 'unsubscribe_category' category.category_name %}">Отписаться от рассылки категории {{ category.category_name }} </a>
+<hr>
+{% else %}
+<a href="{% url 'subscribe_category' category.category_name %}">Подписаться на емайл рассылку категории {{ category.category_name }} </a>
+{% endif %}
+<hr>
+{% endif %}
+{% endfor %}
+{% endblock content %}

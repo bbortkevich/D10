@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Еженедельная рассылка новостей по категории {{category}}</title>
+</head>
+<body>
+Еженедельная рассылка новостей по категории <b>"{{category}}"</b> на которую вы подписаны!
+<br>
+<br>
+{% for post in posts %}
+{% if category in post.categories.all%}
+<br>
+<a href="http://127.0.0.1:8000/news/{{ post.id }}">{{post.title}}</a>
+<br>
+<br>
+<p>{{post.text|truncatechars:50}}</p>
+<hr>
+<br>
+{% endif %}
+{% endfor %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% extends "flatpages/default.html" %}
+{% load custom_filters %}
+{% block title %}
+Страница категории {{ category.category_name }}
+{% endblock title %}
+{% block content %}
+<h1>Страница категории {{ category.category_name }}</h1></h>
+{% if user.is_authenticated %}
+{% if user in category.subscribers.all %}
+<a href="{% url 'unsubscribe_category' category.category_name %}">Отписаться от рассылки категории {{ category.category_name }} </a>
+<hr>
+{% else %}
+<a href="{% url 'subscribe_category' category.category_name %}">Подписаться на емайл рассылку категории {{ category.category_name }} </a>
+{% endif %}
+<hr>
+{% endif %}
+
+{% endblock content %}
